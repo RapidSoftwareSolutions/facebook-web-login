@@ -30,3 +30,65 @@ First, let's add a new endpoint through RapidAPI's dashboard:
 
 Now, after we have created the endpoint and opened the editor for this endpoint, we need to drop in the Database.save block:
 ![Adding an database block to endpoint](http://g.recordit.co/p5ryhpRosT.gif)
+
+Mazal Tov! You are a proud owner of an endpoint! The endpoint now saves data to the database with user's token.
+Now let's generate a code that calls to our endpoint from remote app. For this one we are using a regular JQuery Ajax function.
+
+Here is the proccess of how we can get it:
+![Getting JQuery code](http://g.recordit.co/zMFwBm6f7e.gif)
+
+
+So this is the code that we got from the generator:
+
+```javascript
+jQuery.ajax({
+    url: "http://rapidapi-ebay-testing.rapidapi.io/savetoken",
+    type: "POST",
+    contentType: "application/x-www-form-urlencoded",
+    data: {
+        "fullname": "example",
+        "fbId": "example",
+        "token": "example",
+    },
+})
+.done(function(data, textStatus, jqXHR) {
+    console.log("HTTP Request Succeeded: " + jqXHR.status);
+    console.log(data);
+})
+.fail(function(jqXHR, textStatus, errorThrown) {
+    console.log("HTTP Request Failed");
+})
+.always(function() {
+    /* ... */
+});
+```
+
+Now, when we have the code for integration with RapidAPI, we just need to put it inside the code of the authntication callback in the index.html file.
+
+```javascript
+function sendAuthToRapidAPI() {
+		console.log('Welcome!  Fetching your information.... ');
+		FB.api('/me', function(response) {
+			jQuery.ajax({
+			    url: "http://rapidapi-ebay-testing.rapidapi.io/savetoken",
+			    type: "POST",
+			    contentType: "application/x-www-form-urlencoded",
+			    data: {
+			        "fullname": response.name,
+			        "fbId": response.id,
+			        "token": response.token,
+			    },
+			})
+			.done(function(data, textStatus, jqXHR) {
+			    console.log("HTTP Request Succeeded: " + jqXHR.status);
+			    console.log(data);
+			})
+			.fail(function(jqXHR, textStatus, errorThrown) {
+			    console.log("HTTP Request Failed");
+			})
+			.always(function() {
+			    /* ... */
+			});
+		});
+	}
+```

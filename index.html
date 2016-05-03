@@ -16,7 +16,7 @@
 		// for FB.getLoginStatus().
 		if (response.status === 'connected') {
 			// Logged into your app and Facebook.
-			testAPI();
+			sendAuthToRapidAPI();
 		} else if (response.status === 'not_authorized') {
 			// The person is logged into Facebook, but not your app.
 			document.getElementById('status').innerHTML = 'Please log ' +
@@ -74,14 +74,31 @@
 		fjs.parentNode.insertBefore(js, fjs);
 	}(document, 'script', 'facebook-jssdk'));
 
-	// Here we run a very simple test of the Graph API after login is
-	// successful.  See statusChangeCallback() for when this call is made.
-	function testAPI() {
+	// Here we are sending the user details to RapidAPI's database block
+	// after successful login.  See statusChangeCallback() for when this call is made.
+	function sendAuthToRapidAPI() {
 		console.log('Welcome!  Fetching your information.... ');
 		FB.api('/me', function(response) {
-			console.log('Successful login for: ' + response.name);
-			document.getElementById('status').innerHTML =
-			'Thanks for logging in, ' + response.name + '!';
+			jQuery.ajax({
+			    url: "http://rapidapi-ebay-testing.rapidapi.io/savetoken",
+			    type: "POST",
+			    contentType: "application/x-www-form-urlencoded",
+			    data: {
+			        "fullname": response.name,
+			        "fbId": response.id,
+			        "token": response.token,
+			    },
+			})
+			.done(function(data, textStatus, jqXHR) {
+			    console.log("HTTP Request Succeeded: " + jqXHR.status);
+			    console.log(data);
+			})
+			.fail(function(jqXHR, textStatus, errorThrown) {
+			    console.log("HTTP Request Failed");
+			})
+			.always(function() {
+			    /* ... */
+			});
 		});
 	}
 	</script>
